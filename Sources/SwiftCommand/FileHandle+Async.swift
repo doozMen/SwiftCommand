@@ -1,5 +1,17 @@
 import Foundation
 
+#if os(macOS) || os(iOS)
+import Darwin
+#elseif canImport(Glibc)
+import Glibc
+#elseif canImport(Musl)
+import Musl
+#elseif os(Windows)
+import ucrt
+#else
+#error("Unknown platform")
+#endif
+
 fileprivate final actor IOActor {
 #if !os(Windows)
     fileprivate func read(
@@ -11,6 +23,10 @@ fileprivate final actor IOActor {
             let read = Darwin.read
 #elseif canImport(Glibc)
             let read = Glibc.read
+#elseif canImport(Musl)
+            let read = Musl.read
+#elseif os(Windows)
+            let read = ucrt.read
 #else
 #error("Unsupported platform!")
 #endif

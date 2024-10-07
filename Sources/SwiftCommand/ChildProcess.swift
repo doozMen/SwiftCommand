@@ -5,6 +5,18 @@ import Foundation
 import WinSDK
 #endif
 
+#if os(macOS) || os(iOS)
+import Darwin
+#elseif canImport(Glibc)
+import Glibc
+#elseif canImport(Musl)
+import Musl
+#elseif os(Windows)
+import ucrt
+#else
+#error("Unknown platform")
+#endif
+
 /// Handle to a running or exited child process
 ///
 /// This class is used to represent and manage child processes. A child process
@@ -721,6 +733,8 @@ where Stdin: InputSource, Stdout: OutputDestination, Stderr: OutputDestination {
             Darwin.kill(self.process.processIdentifier, SIGKILL)
             #elseif canImport(Glibc)
             Glibc.kill(self.process.processIdentifier, SIGKILL)
+            #elseif canImport(Musl)
+            Musl.kill(self.process.processIdentifier, SIGKILL)
             #else
             #error("Unsupported platform!")
             #endif
